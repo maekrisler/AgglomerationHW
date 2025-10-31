@@ -245,7 +245,7 @@ if __name__ == "__main__":
     
     # this portion only necessary for the report section of part 2. hence, commented out 
     # since all the values have been recorded already in the report
-    # part2(cross_corrdf, strong_corrs)
+    part2(cross_corrdf, strong_corrs)
 
     # perform agglomerative clustering
-    cluster_members, merge_history, cluster_centers = agglomerate(df)
+    # cluster_members, merge_history, cluster_centers = agglomerate(df)
