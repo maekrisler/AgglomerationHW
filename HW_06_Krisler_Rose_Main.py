@@ -41,6 +41,8 @@ def fetch_distmtx(cross_corrdf):
 
 # def agglomerate(df, cross_corrdf, strong_corrs):
 
+# TODO: implement test suite with small #s of data points
+
 
 if __name__ == "__main__":
     filename = "HW_CLUSTERING_SHOPPING_CART_v2245a.csv"
