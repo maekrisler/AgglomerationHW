@@ -33,17 +33,6 @@ def fetch_distmtx(cross_corrdf):
 
     return dist_mtx
 
-# TODO: find irrelevant attributes --> i dont think we need to code for this?
-# TODO: implement agglomerative clustering
-    # cross correlation provies a similarity between data points for
-    # agglmeration
-
-    # the datapoints with smallest CC can be merged together first
-
-# def agglomerate(df, cross_corrdf, strong_corrs):
-
-# TODO: implement test suite with small #s of data points
-
 
 # this function just answers all the questions that are part of the reporting section of Part 2
 def part2(cross_corrdf, strong_corrs):
@@ -232,9 +221,58 @@ def agglomerate(data_df):
     return cluster_members, merge_history, cluster_centers
 
 
+def graph_dendrogram(merge_history, num_samples):
+    # create a linkage mtx array to track the agglomeration process for dendrogram graphing
+    linkage_mtx = []
+    # get the number of clusters for dendrogram tracking
+    cur_cluster = num_samples
+
+    # because the agglomeration deletes and reuses idx names, ids are not unique
+    # dendrograms need unique cluster ids to graph, so we must create a dict
+    # to hold unique cluster id values
+    id_map = {i: i for i in range(num_samples)}
+
+    # iterate through all the merges tracked during agglomeration
+    for merge in merge_history:
+        # get the tracked clusters that were merged
+        c1 = merge['cluster_1']
+        c2 = merge['cluster_2']
+        # get this distance btwn clusters
+        distance = merge['distance']
+        # create the new cluster size by adding c1 and c2 sizes
+        new_size = merge['size_1'] + merge['size_2']
+
+        # get the unique ids for each cluster from the dict created
+        c1_uniqueID = id_map[c1]
+        c2_uniqueID = id_map[c2]
+
+        # append all values to the linkage mtx for dendrogram plotting with scikit-learn
+        linkage_mtx.append([c1_uniqueID, c2_uniqueID, distance, new_size])
+
+        # assign new cluster id to the first cluster merged together
+        id_map[c1] = cur_cluster
+
+        # remove the second merged cluster from the unique id dict so it is not reused
+        if c2 in id_map:
+            del id_map[c2]
+
+        # increment to the next cluster
+        cur_cluster += 1
+
+    # convert the array to a numpy array
+    linkage_mtx = np.array(linkage_mtx)
+
+    # plot the denogram using scikit-learn
+    plt.figure(figsize=(10, 5))
+    dendrogram(linkage_mtx)
+    plt.title("Shopping Cart Dendrogram")
+    plt.show()
+
+
+
 
 if __name__ == "__main__":
-    filename = "HW_CLUSTERING_SHOPPING_CART_v2245a.csv"
+    filename = "TEST_DATA.csv"
     df_withID = pd.read_csv(filename)
     df = pd.read_csv(filename)
     df = df.rename(columns=lambda x: x.strip())  # remove leading/trailing spaces in col names
@@ -247,7 +285,11 @@ if __name__ == "__main__":
     
     # this portion only necessary for the report section of part 2. hence, commented out 
     # since all the values have been recorded already in the report
-    part2(cross_corrdf, strong_corrs)
+    # part2(cross_corrdf, strong_corrs)
 
     # perform agglomerative clustering
-    # cluster_members, merge_history, cluster_centers = agglomerate(df)
+    cluster_members, merge_history, cluster_centers = agglomerate(df)
+
+    num_samples = df.shape[0] # pass in the number of rows not columns
+    # columns  = # of features not number of samples
+    graph_dendrogram(merge_history, num_samples)
