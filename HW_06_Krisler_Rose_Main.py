@@ -198,6 +198,8 @@ def agglomerate(data_df):
             'iteration': iteration,
             'cluster_1': cluster_1,
             'cluster_2': cluster_2,
+            'size_1': size_cluster_1,
+            'size_2': size_cluster_2,
             'smallest_size': smallest_cluster_size,
             'distance': min_distance
         })
